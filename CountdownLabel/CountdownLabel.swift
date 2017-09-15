@@ -38,6 +38,8 @@ extension TimeInterval {
         return df
     }
     
+    public var zeroAlternativeWord: String?
+    
     public var timeCounted: TimeInterval {
         let timeCounted = NSDate().timeIntervalSince(fromDate as Date)
         return round(timeCounted < 0 ? 0 : timeCounted)
@@ -181,7 +183,13 @@ extension TimeInterval {
         
         // if end of timer
         if endOfTimer {
-            text = dateFormatter.string(from: date1970.addingTimeInterval(0) as Date)
+            let textToAssign = dateFormatter.string(from: date1970.addingTimeInterval(0) as Date)
+            if zeroAlternativeWord == nil && textToAssign != "0" {
+                text = textToAssign
+            } else {
+                text = zeroAlternativeWord
+            }
+            
             countdownDelegate?.countdownFinished?()
             dispose()
             completion?()
@@ -216,7 +224,7 @@ extension CountdownLabel {
         countdownDelegate?.countdownStarted?()
     }
     
-    func pause(completion: (() -> ())? = nil) {
+    @objc public func pause(completion: (() -> ())? = nil) {
         if paused {
             return
         }
@@ -238,8 +246,13 @@ extension CountdownLabel {
         countdownDelegate?.countdownPaused?()
     }
     
-    func cancel(completion: (() -> ())? = nil) {
-        text = dateFormatter.string(from: date1970.addingTimeInterval(0) as Date)
+    @objc public func cancel(completion: (() -> ())? = nil) {
+        let textToAssign = dateFormatter.string(from: date1970.addingTimeInterval(0) as Date)
+        if zeroAlternativeWord == nil || textToAssign != "0" {
+            text = textToAssign
+        } else {
+            text = zeroAlternativeWord
+        }
         dispose()
         
         // set completion if needed
@@ -277,9 +290,13 @@ extension CountdownLabel {
         guard diffDate != nil else { return }
 
         // if time is before start
-        let formattedText = timeCounted < 0
+        var formattedText = timeCounted < 0
             ? dateFormatter.string(from: date1970.addingTimeInterval(0) as Date)
             : dateFormatter.string(from: diffDate.addingTimeInterval(round(timeCounted * -1)) as Date)
+        
+        if zeroAlternativeWord != nil && formattedText == "0" {
+            formattedText = zeroAlternativeWord
+        }
         
         if let countdownAttributedText = countdownAttributedText {
             let attrTextInRange = NSAttributedString(string: formattedText, attributes: countdownAttributedText.attributes)
