@@ -187,7 +187,7 @@ extension TimeInterval {
             if zeroAlternativeWord == nil && textToAssign != "0" {
                 text = textToAssign
             } else {
-                text = zeroAlternativeWord
+                text = zeroAlternativeWord!
             }
             
             countdownDelegate?.countdownFinished?()
@@ -251,7 +251,7 @@ extension CountdownLabel {
         if zeroAlternativeWord == nil || textToAssign != "0" {
             text = textToAssign
         } else {
-            text = zeroAlternativeWord
+            text = zeroAlternativeWord!
         }
         dispose()
         
@@ -295,7 +295,7 @@ extension CountdownLabel {
             : dateFormatter.string(from: diffDate.addingTimeInterval(round(timeCounted * -1)) as Date)
         
         if zeroAlternativeWord != nil && formattedText == "0" {
-            formattedText = zeroAlternativeWord
+            formattedText = zeroAlternativeWord!
         }
         
         if let countdownAttributedText = countdownAttributedText {
