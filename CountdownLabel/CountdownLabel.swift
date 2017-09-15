@@ -13,7 +13,7 @@ import UIKit
     @objc optional func countdownPaused()
     @objc optional func countdownFinished()
     @objc optional func countdownCancelled()
-    @objc optional func countingAt(timeCounted timeCounted: TimeInterval, timeRemaining: TimeInterval)
+    @objc optional func countingAt(timeCounted: TimeInterval, timeRemaining: TimeInterval)
 
 }
 extension TimeInterval {
@@ -22,7 +22,7 @@ extension TimeInterval {
     }
 }
 
-class CountdownLabel: LTMorphingLabel {
+@objc public class CountdownLabel: LTMorphingLabel {
     
     public typealias CountdownCompletion = () -> ()?
     public typealias CountdownExecution = () -> ()
@@ -62,7 +62,7 @@ class CountdownLabel: LTMorphingLabel {
     public weak var countdownDelegate: CountdownLabelDelegate?
     
     // user settings
-    public var animationType: CountdownEffect? {
+    var animationType: CountdownEffect? {
         didSet {
             if let effect = animationType?.toLTMorphing() {
                 morphingEffect = effect
@@ -72,9 +72,9 @@ class CountdownLabel: LTMorphingLabel {
             }
         }
     }
-    public var timeFormat = "HH:mm:ss"
+    public var timeFormat = "s"
     public var thens = [TimeInterval: CountdownExecution]()
-    public var countdownAttributedText: CountdownAttributedText! {
+    var countdownAttributedText: CountdownAttributedText! {
         didSet {
             range = (countdownAttributedText.text as NSString).range(of: countdownAttributedText.replacement)
         }
@@ -191,7 +191,10 @@ class CountdownLabel: LTMorphingLabel {
 
 // MARK: - Public
 extension CountdownLabel {
-    func start(completion: ( () -> () )? = nil) {
+    public func start(completion: ( () -> () )? = nil) {
+        morphingEffect = .Evaporate
+        morphingEnabled = true
+
         if !isPaused {
             // current date should be setted at the time of the counter's starting, or the time will be wrong (just a few seconds) after the first time of pausing.
             currentDate = NSDate()
